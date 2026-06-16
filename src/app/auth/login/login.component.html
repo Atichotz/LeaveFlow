@@ -2,7 +2,7 @@
 
   <!-- Left panel -->
   <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden p-12 lg:flex"
-       style="background: linear-gradient(150deg, #1E3A5F 0%, #0F2744 100%);">
+    style="background: linear-gradient(150deg, #1E3A5F 0%, #0F2744 100%);">
 
     <!-- Decorative blobs -->
     <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl"></div>
@@ -11,7 +11,7 @@
     <!-- Logo -->
     <div class="relative flex items-center gap-3">
       <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-sm font-bold text-white"
-           style="font-family: 'Poppins', sans-serif;">LF</div>
+        style="font-family: 'Poppins', sans-serif;">LF</div>
       <span class="text-xl font-bold text-white" style="font-family: 'Poppins', sans-serif;">LeaveFlow</span>
     </div>
 
@@ -50,7 +50,7 @@
       <div class="mb-6 lg:hidden">
         <div class="flex items-center gap-2.5">
           <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-sidebar text-xs font-bold text-white"
-               style="font-family: 'Poppins', sans-serif;">LF</div>
+            style="font-family: 'Poppins', sans-serif;">LF</div>
           <span class="text-xl font-bold text-sidebar" style="font-family: 'Poppins', sans-serif;">LeaveFlow</span>
         </div>
       </div>
@@ -67,17 +67,11 @@
           <!-- Employee ID -->
           <div class="form-field">
             <label class="form-label" for="employeeId">รหัสพนักงาน</label>
-            <input
-              id="employeeId"
-              type="text"
-              formControlName="employeeId"
-              placeholder="เช่น EMP002"
-              autocomplete="username"
-              class="form-input"
-              [class.border-red-400]="employeeIdCtrl.invalid && employeeIdCtrl.touched"
-            />
+            <input id="employeeId" type="text" formControlName="employeeId" placeholder="เช่น EMP002"
+              autocomplete="username" class="form-input"
+              [class.border-red-400]="employeeIdCtrl.invalid && employeeIdCtrl.touched" />
             @if (employeeIdCtrl.invalid && employeeIdCtrl.touched) {
-              <p class="text-xs text-red-500">กรุณากรอกรหัสพนักงาน</p>
+            <p class="text-xs text-red-500">กรุณากรอกรหัสพนักงาน</p>
             }
           </div>
 
@@ -85,46 +79,33 @@
           <div class="form-field">
             <label class="form-label" for="password">รหัสผ่าน</label>
             <div class="relative">
-              <input
-                id="password"
-                [type]="showPassword() ? 'text' : 'password'"
-                formControlName="password"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                class="form-input w-full pr-10"
-                [class.border-red-400]="passwordCtrl.invalid && passwordCtrl.touched"
-              />
-              <button
-                type="button"
-                (click)="toggleShowPassword()"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
-              >
+              <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+                placeholder="••••••••" autocomplete="current-password" class="form-input w-full pr-10"
+                [class.border-red-400]="passwordCtrl.invalid && passwordCtrl.touched" />
+              <button type="button" (click)="toggleShowPassword()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
                 <fa-icon [icon]="showPassword() ? eyeSlashIcon : eyeIcon" />
               </button>
             </div>
             @if (passwordCtrl.invalid && passwordCtrl.touched) {
-              <p class="text-xs text-red-500">กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร</p>
+            <p class="text-xs text-red-500">กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร</p>
             }
           </div>
 
           <!-- Error message -->
           @if (errorMessage()) {
-            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {{ errorMessage() }}
-            </div>
+          <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {{ errorMessage() }}
+          </div>
           }
 
           <!-- Submit -->
-          <button
-            type="submit"
-            [disabled]="isLoading()"
-            class="btn-primary w-full justify-center py-2.5"
-          >
+          <button type="submit" [disabled]="isLoading()" class="btn-primary w-full justify-center py-2.5">
             @if (isLoading()) {
-              <fa-icon [icon]="spinnerIcon" class="mr-2 animate-spin" />
-              กำลังเข้าสู่ระบบ...
+            <fa-icon [icon]="spinnerIcon" class="mr-2 animate-spin" />
+            กำลังเข้าสู่ระบบ...
             } @else {
-              เข้าสู่ระบบ
+            เข้าสู่ระบบ
             }
           </button>
 

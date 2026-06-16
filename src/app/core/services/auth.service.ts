@@ -35,9 +35,14 @@ export class AuthService {
   private static loadFromStorage(): User | null {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as User) : null;
+      if (raw) {
+        return JSON.parse(raw) as User;
+      }
+
+      // Demo fallback: ถ้าไม่มี user ใน localStorage ให้ใช้ mock employee คนแรก
+      return MOCK_USERS.find(u => u.role === 'employee') ?? MOCK_USERS[0] ?? null;
     } catch {
-      return null;
+      return MOCK_USERS.find(u => u.role === 'employee') ?? MOCK_USERS[0] ?? null;
     }
   }
 }
