@@ -1,0 +1,103 @@
+<div class="space-y-6">
+
+  <div>
+    <h1 class="page-title">ยื่นคำขอลา</h1>
+    <p class="mt-0.5 text-sm text-gray-500">กรอกข้อมูลการลางานของคุณ</p>
+  </div>
+
+  <div class="card max-w-2xl p-6">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-5">
+
+      <!-- Leave type -->
+      <div class="form-field">
+        <label class="form-label" for="leaveType">ประเภทการลา</label>
+        <select id="leaveType" formControlName="leaveType" class="form-input">
+          @for (opt of leaveTypeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Date range calendar -->
+      <div class="form-field">
+        <label class="form-label">วันที่ลา</label>
+        <div class="rounded-xl border p-4"
+          [class.border-red-300]="ctrl.startDate.invalid && ctrl.startDate.touched"
+          [class.border-gray-200]="!(ctrl.startDate.invalid && ctrl.startDate.touched)">
+          <app-date-range-calendar
+            (startChange)="onStartDate($event)"
+            (endChange)="onEndDate($event)"
+          />
+        </div>
+        @if (ctrl.startDate.invalid && ctrl.startDate.touched) {
+          <p class="text-xs text-red-500">กรุณาเลือกวันที่เริ่มต้น</p>
+        }
+        @if (form.hasError('endBeforeStart') && ctrl.endDate.touched) {
+          <p class="text-xs text-red-500">วันสิ้นสุดต้องไม่ก่อนวันเริ่มต้น</p>
+        }
+      </div>
+
+      <!-- Working days summary -->
+      @if (workingDays() > 0) {
+        <div class="rounded-lg bg-primary-light px-4 py-3 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">
+              {{ formatDate(ctrl.startDate.value) }}
+              @if (ctrl.startDate.value !== ctrl.endDate.value) {
+                – {{ formatDate(ctrl.endDate.value) }}
+              }
+            </span>
+            <span>
+              <span class="font-semibold text-primary">{{ workingDays() }} วันทำการ</span>
+              <span class="ml-1 text-gray-500">(คงเหลือ {{ remainingForType() }} วัน)</span>
+            </span>
+          </div>
+        </div>
+      }
+
+      <!-- Past date warning -->
+      @if (isPastDate()) {
+        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          ⚠️ วันที่ที่เลือกอยู่ในอดีต คำขอจะถูกส่งแต่อาจต้องมีเหตุผลเพิ่มเติม
+        </div>
+      }
+
+      <!-- Exceeds balance error -->
+      @if (exceedsBalance()) {
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          จำนวนวันที่ขอ ({{ workingDays() }} วัน) เกินสิทธิ์คงเหลือ ({{ remainingForType() }} วัน) — ไม่สามารถส่งคำขอได้
+        </div>
+      }
+
+      <!-- Reason -->
+      <div class="form-field">
+        <label class="form-label" for="reason">เหตุผล</label>
+        <textarea
+          id="reason"
+          formControlName="reason"
+          rows="4"
+          placeholder="ระบุเหตุผลในการลา..."
+          class="form-input resize-none"
+          [class.border-red-400]="ctrl.reason.invalid && ctrl.reason.touched"
+        ></textarea>
+        @if (ctrl.reason.invalid && ctrl.reason.touched) {
+          <p class="text-xs text-red-500">กรุณากรอกเหตุผลอย่างน้อย 10 ตัวอักษร</p>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+        <a routerLink="/employee/history" class="btn-outline">ยกเลิก</a>
+        <button
+          type="submit"
+          [disabled]="form.invalid || exceedsBalance() || isLoading()"
+          class="btn-primary"
+        >
+          @if (isLoading()) { กำลังส่ง... } @else { ส่งคำขอลา }
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

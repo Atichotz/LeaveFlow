@@ -1,0 +1,134 @@
+/* ─── Tailwind directives ─────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-slate-50 text-gray-800;
+  }
+}
+
+/* ─── Shared component patterns ───────────────────────────────────────────── */
+/*                                                                             */
+/*  Rule: เพิ่ม class ที่นี่เมื่อ utility combo เดียวกัน (≥ 3 class)           */
+/*  ถูกใช้ใน ≥ 2 component ที่ต่างกัน                                          */
+/*  Override เฉพาะ component → ทำใน component .scss แทน                        */
+/*                                                                             */
+@layer components {
+
+  /* ── Card ─────────────────────────────────────────────────────────────── */
+  /* ใช้: stat-card, data-table, approval-card, leave-balance-card */
+  .card {
+    @apply rounded-2xl bg-white border border-gray-100 shadow-sm;
+  }
+
+  /* ── Buttons ──────────────────────────────────────────────────────────── */
+  /* Base: reset browser defaults, ทุก button variant ต้อง compose จาก .btn */
+  .btn {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* ── Button variants — repeat base classes แทนการ @apply .btn ────────── */
+  /* (Tailwind v3: ห้าม @apply class ที่ตัวเองมี @apply ซ้อนกัน) */
+  .btn-primary {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           text-white shadow-sm;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  }
+
+  .btn-primary:not(:disabled):hover {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  }
+
+  .btn-danger {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-red-500 text-white hover:bg-red-600;
+  }
+
+  .btn-success {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-emerald-500 text-white hover:bg-emerald-600;
+  }
+
+  .btn-outline {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300;
+  }
+
+  /* ── Status Badge ─────────────────────────────────────────────────────── */
+  /* ใช้: status-badge component, approval-card, history table */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-approved {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-emerald-50 text-emerald-700;
+  }
+
+  .badge-pending {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-amber-50 text-amber-700;
+  }
+
+  .badge-rejected {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-red-50 text-red-700;
+  }
+
+  /* ── Form Field ───────────────────────────────────────────────────────── */
+  /* ใช้: login form, leave-request form */
+  .form-field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .form-label {
+    @apply text-sm font-medium text-gray-700;
+  }
+
+  .form-input {
+    @apply rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800
+           focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20
+           disabled:bg-gray-50 disabled:text-gray-400 transition-colors;
+  }
+
+  /* ── Table ────────────────────────────────────────────────────────────── */
+  /* ใช้: data-table component (admin + employee history) */
+  .table-wrapper {
+    @apply overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm;
+  }
+
+  .table-header-cell {
+    @apply px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-400;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 text-sm text-gray-700;
+  }
+
+  .table-row {
+    @apply hover:bg-slate-50 transition-colors;
+  }
+
+  /* ── Section Title ────────────────────────────────────────────────────── */
+  /* ใช้: card header, page section */
+  .section-title {
+    @apply text-base font-semibold text-gray-700;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* ── Page Title ───────────────────────────────────────────────────────── */
+  .page-title {
+    @apply text-2xl font-bold text-gray-900;
+    font-family: 'Poppins', sans-serif;
+  }
+}

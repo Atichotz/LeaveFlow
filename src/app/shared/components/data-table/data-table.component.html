@@ -1,0 +1,48 @@
+<div class="table-wrapper">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th class="table-header-cell">{{ col.label }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 bg-white">
+        @for (row of data(); track $index) {
+          <tr class="table-row">
+            @for (col of columns(); track col.key) {
+              <td class="table-cell">
+                @switch (col.type) {
+                  @case ('status') {
+                    <app-status-badge [status]="asLeaveStatus(getCellValue(row, col.key))" />
+                  }
+                  @case ('date') {
+                    {{ asDate(getCellValue(row, col.key)) | date : 'dd/MM/yyyy' }}
+                  }
+                  @case ('days') {
+                    {{ asNumber(getCellValue(row, col.key)) }} วัน
+                  }
+                  @default {
+                    {{ getCellValue(row, col.key) }}
+                  }
+                }
+              </td>
+            }
+          </tr>
+        }
+
+        @if (data().length === 0) {
+          <tr>
+            <td
+              [attr.colspan]="columns().length"
+              class="table-cell py-10 text-center text-gray-400"
+            >
+              ไม่มีข้อมูล
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

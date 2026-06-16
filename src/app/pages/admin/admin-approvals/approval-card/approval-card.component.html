@@ -1,0 +1,40 @@
+<div class="card flex flex-col gap-4 p-5">
+
+  <!-- Employee info -->
+  <div class="flex items-center gap-3">
+    <app-avatar [user]="request().employee" size="md" />
+    <div>
+      <p class="font-semibold text-gray-800">{{ request().employee.name }}</p>
+      <p class="text-xs text-gray-400">{{ request().employee.department }} · {{ request().employee.position }}</p>
+    </div>
+  </div>
+
+  <!-- Leave details -->
+  <div class="space-y-2 rounded-xl border-l-2 border-blue-100 bg-slate-50 p-3 text-sm">
+    <div class="flex items-center gap-2 text-gray-600">
+      <fa-icon [icon]="icons.tag" class="w-4 text-gray-400" />
+      <span>{{ request().leaveTypeLabel }}</span>
+    </div>
+    <div class="flex items-center gap-2 text-gray-600">
+      <fa-icon [icon]="icons.calendar" class="w-4 text-gray-400" />
+      <span>
+        {{ request().startDate | date:'d MMM yyyy' }}
+        @if (request().totalDays > 1) {
+          – {{ request().endDate | date:'d MMM yyyy' }}
+        }
+        <span class="ml-1 font-medium text-gray-800">({{ request().totalDays }} วัน)</span>
+      </span>
+    </div>
+    <div class="flex items-start gap-2 text-gray-600">
+      <fa-icon [icon]="icons.file" class="mt-0.5 w-4 text-gray-400" />
+      <span class="leading-relaxed">{{ request().reason }}</span>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="flex gap-2">
+    <button class="btn-success flex-1" (click)="approve.emit()">อนุมัติ</button>
+    <button class="btn-danger flex-1" (click)="reject.emit()">ปฏิเสธ</button>
+  </div>
+
+</div>

@@ -1,0 +1,56 @@
+<aside class="sidebar-panel fixed inset-y-0 left-0 z-30 flex w-64 flex-col transition-transform duration-300
+         md:relative md:inset-auto md:z-auto md:h-full" [class.sidebar-open]="isOpen()">
+
+  <!-- Logo -->
+  <div class="flex h-16 items-center justify-between gap-2.5 px-5">
+    <div class="flex items-center gap-2.5">
+      <div
+        class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-white/15 text-xs font-bold text-white"
+        style="font-family: 'Poppins', sans-serif;">
+        LF
+      </div>
+      <span class="text-lg font-bold tracking-tight text-white"
+        style="font-family: 'Poppins', sans-serif;">LeaveFlow</span>
+    </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div class="mx-4 h-px bg-white/10"></div>
+  <button (click)="ToggleAdmin.set(!ToggleAdmin())"
+    class="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+    title="Toggle sidebar">
+    {{ ToggleAdmin() ? 'Switch to Employee View' : 'Switch to Admin View' }}
+  </button>
+
+  <!-- Nav -->
+  <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
+    @for (item of navItems(); track item.route) {
+    <a [routerLink]="item.route" routerLinkActive="nav-active bg-white/15 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition-all hover:bg-white/10 hover:text-white cursor-pointer"
+      (click)="closed.emit()">
+      <fa-icon [icon]="item.icon" class="w-5 text-center" />
+      {{ item.label }}
+    </a>
+    }
+  </nav>
+
+  <!-- User profile + Logout -->
+  @if (auth.currentUser(); as user) {
+  <div class="border-t border-white/10 p-4">
+    <div class="flex items-center gap-3">
+      <app-avatar [user]="user" size="md" />
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-semibold text-white">{{ user.name }}</p>
+        <p class="truncate text-xs text-white/40">{{ user.position }}</p>
+      </div>
+      <button (click)="logout()"
+        class="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+        title="ออกจากระบบ">
+        <fa-icon [icon]="logoutIcon" />
+      </button>
+    </div>
+  </div>
+  }
+</aside>

@@ -1,1 +1,135 @@
-/* You can add global styles to this file, and also import other style files */
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ─── Tailwind directives ─────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Custom Theme (Tailwind v4: CSS-first, แทน tailwind.config.js) ─────────── */
+@theme {
+  /* Sidebar */
+  --color-sidebar: #1E3A5F;
+  --color-sidebar-hover: #243f6a;
+  --color-sidebar-active: #2d4f7f;
+
+  /* Primary (blue) */
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  --color-primary-light: #EFF6FF;
+
+  /* Status */
+  --color-status-approved: #10B981;
+  --color-status-approved-bg: #ECFDF5;
+  --color-status-pending: #F59E0B;
+  --color-status-pending-bg: #FFFBEB;
+  --color-status-rejected: #EF4444;
+  --color-status-rejected-bg: #FEF2F2;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-gray-100 text-gray-800;
+  }
+}
+
+/* ─── Shared component patterns ───────────────────────────────────────────── */
+/*                                                                             */
+/*  Rule: เพิ่ม class ที่นี่เมื่อ utility combo เดียวกัน (≥ 3 class)           */
+/*  ถูกใช้ใน ≥ 2 component ที่ต่างกัน                                          */
+/*  Override เฉพาะ component → ทำใน component .scss แทน                        */
+/*                                                                             */
+@layer components {
+
+  /* ── Card ─────────────────────────────────────────────────────────────── */
+  /* ใช้: stat-card, data-table, approval-card, leave-balance-card */
+  .card {
+    @apply rounded-xl bg-white shadow-sm;
+  }
+
+  /* ── Buttons ──────────────────────────────────────────────────────────── */
+  /* Base: reset browser defaults, ทุก button variant ต้อง compose จาก .btn */
+  .btn {
+    @apply rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-hover;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-500 text-white hover:bg-red-600;
+  }
+
+  .btn-success {
+    @apply btn bg-emerald-500 text-white hover:bg-emerald-600;
+  }
+
+  .btn-outline {
+    @apply btn border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50;
+  }
+
+  /* ── Status Badge ─────────────────────────────────────────────────────── */
+  /* ใช้: status-badge component, approval-card, history table */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-approved {
+    @apply badge bg-emerald-50 text-emerald-700;
+  }
+
+  .badge-pending {
+    @apply badge bg-amber-50 text-amber-700;
+  }
+
+  .badge-rejected {
+    @apply badge bg-red-50 text-red-700;
+  }
+
+  /* ── Form Field ───────────────────────────────────────────────────────── */
+  /* ใช้: login form, leave-request form */
+  .form-field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .form-label {
+    @apply text-sm font-medium text-gray-700;
+  }
+
+  .form-input {
+    @apply rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-50 disabled:text-gray-400;
+  }
+
+  /* ── Table ────────────────────────────────────────────────────────────── */
+  /* ใช้: data-table component (admin + employee history) */
+  .table-wrapper {
+    @apply overflow-hidden rounded-xl bg-white shadow-sm;
+  }
+
+  .table-header-cell {
+    @apply px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 text-sm text-gray-700;
+  }
+
+  .table-row {
+    @apply hover:bg-gray-50 transition-colors;
+  }
+
+  /* ── Section Title ────────────────────────────────────────────────────── */
+  /* ใช้: card header, page section */
+  .section-title {
+    @apply text-lg font-semibold text-gray-700;
+  }
+
+  /* ── Page Title ───────────────────────────────────────────────────────── */
+  .page-title {
+    @apply text-2xl font-bold text-gray-800;
+  }
+}
+

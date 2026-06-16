@@ -1,0 +1,64 @@
+<div class="space-y-6">
+
+  <!-- Page heading -->
+  <div>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="mt-0.5 text-sm text-gray-500">ภาพรวมระบบการลาพนักงาน</p>
+  </div>
+
+  <!-- Stats row -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      @for (_ of [1,2,3,4]; track $index) {
+        <app-stat-card-skeleton />
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <app-stat-card
+        label="พนักงานทั้งหมด"
+        [value]="employeeCount"
+        [icon]="icons.users"
+        iconColorClass="text-primary"
+        iconBgClass="bg-primary-light"
+      />
+      <app-stat-card
+        label="คำขอรออนุมัติ"
+        [value]="pendingCount()"
+        [icon]="icons.pending"
+        iconColorClass="text-amber-600"
+        iconBgClass="bg-amber-50"
+      />
+      <app-stat-card
+        label="อนุมัติแล้วเดือนนี้"
+        [value]="approvedThisMonth()"
+        [icon]="icons.approved"
+        iconColorClass="text-emerald-600"
+        iconBgClass="bg-emerald-50"
+      />
+      <app-stat-card
+        label="วันหยุดนักขัตฤกษ์เดือนนี้"
+        [value]="holidaysThisMonth()"
+        [icon]="icons.holiday"
+        iconColorClass="text-purple-600"
+        iconBgClass="bg-purple-50"
+      />
+    </div>
+  }
+
+  <!-- Recent leave requests -->
+  <div>
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="section-title">คำขอลาล่าสุด</h2>
+      <a routerLink="/admin/approvals" class="text-sm text-primary hover:underline">
+        ดูคำขอรอดำเนินการ →
+      </a>
+    </div>
+    @if (isLoading()) {
+      <app-table-skeleton [cols]="5" />
+    } @else {
+      <app-data-table [columns]="tableColumns" [data]="tableData()" />
+    }
+  </div>
+
+</div>

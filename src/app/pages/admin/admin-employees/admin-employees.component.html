@@ -1,0 +1,71 @@
+<div class="space-y-6">
+
+  <!-- Page heading + Search -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="page-title">จัดการพนักงาน</h1>
+      <p class="mt-0.5 text-sm text-gray-500">รายชื่อพนักงานทั้งหมดในระบบ</p>
+    </div>
+    <!-- Search bar -->
+    <div class="relative w-full sm:w-auto">
+      <fa-icon [icon]="searchIcon" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+      <input
+        type="text"
+        placeholder="ค้นหาชื่อหรือรหัสพนักงาน..."
+        class="form-input pl-9 w-full sm:w-64"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </div>
+  </div>
+
+  <!-- Employee table -->
+  @if (isLoading()) {
+    <app-table-skeleton [cols]="5" />
+  } @else {
+  <div class="table-wrapper">
+    <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="border-b border-gray-100 bg-gray-50">
+        <tr>
+          <th class="table-header-cell">พนักงาน</th>
+          <th class="table-header-cell">รหัสพนักงาน</th>
+          <th class="table-header-cell">แผนก</th>
+          <th class="table-header-cell">ตำแหน่ง</th>
+          <th class="table-header-cell">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        @for (emp of employees(); track emp.id) {
+          <tr class="table-row">
+            <td class="table-cell">
+              <div class="flex items-center gap-3">
+                <app-avatar [user]="emp" size="sm" />
+                <span class="font-medium text-gray-800">{{ emp.name }}</span>
+              </div>
+            </td>
+            <td class="table-cell font-mono text-xs text-gray-500">{{ emp.employeeId }}</td>
+            <td class="table-cell">{{ emp.department }}</td>
+            <td class="table-cell">{{ emp.position }}</td>
+            <td class="table-cell">
+              @if (emp.isActive) {
+                <span class="badge bg-emerald-50 text-emerald-700">ปฏิบัติงาน</span>
+              } @else {
+                <span class="badge bg-gray-100 text-gray-500">ไม่ได้ปฏิบัติงาน</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-400">
+              ไม่พบพนักงานที่ตรงกับ "{{ searchQuery() }}"
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    </div>
+  </div>
+  }
+
+</div>

@@ -1,0 +1,53 @@
+<div class="select-none">
+
+  <!-- Month navigation -->
+  <div class="mb-3 flex items-center justify-between">
+    <button type="button" (click)="prevMonth()"
+      class="flex h-8 w-8 items-center justify-center rounded-full text-lg text-gray-500 hover:bg-gray-100 transition-colors">
+      ‹
+    </button>
+    <span class="text-sm font-semibold text-gray-700">{{ monthLabel() }}</span>
+    <button type="button" (click)="nextMonth()"
+      class="flex h-8 w-8 items-center justify-center rounded-full text-lg text-gray-500 hover:bg-gray-100 transition-colors">
+      ›
+    </button>
+  </div>
+
+  <!-- Weekday headers -->
+  <div class="mb-1 grid grid-cols-7">
+    @for (w of weekdays; track w) {
+      <div class="py-1 text-center text-xs font-medium text-gray-400">{{ w }}</div>
+    }
+  </div>
+
+  <!-- Days grid -->
+  <div class="grid grid-cols-7" (mouseleave)="onLeave()">
+    @for (day of viewDays(); track day.dateStr) {
+      <div class="relative py-0.5" (mouseenter)="onHover(day.dateStr)">
+
+        <!-- Range strip (sits behind the circle) -->
+        @if (day.showStrip) {
+          <div
+            class="absolute inset-y-0.5 bg-primary-light"
+            [style.left]="day.stripFirst ? '50%' : '0'"
+            [style.right]="day.stripLast ? '50%' : '0'"
+          ></div>
+        }
+
+        <!-- Day circle -->
+        <button
+          type="button"
+          [class]="day.circleClass"
+          (click)="onDayClick(day.dateStr)"
+        >{{ day.day }}</button>
+
+      </div>
+    }
+  </div>
+
+  <!-- Hint -->
+  @if (selectionHint()) {
+    <p class="mt-2 text-center text-xs text-gray-400">{{ selectionHint() }}</p>
+  }
+
+</div>

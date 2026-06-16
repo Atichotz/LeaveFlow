@@ -1,0 +1,26 @@
+<div class="space-y-6">
+
+  <div>
+    <h1 class="page-title">ประวัติการลา</h1>
+    <p class="mt-0.5 text-sm text-gray-500">รายการคำขอลาทั้งหมดของคุณ</p>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="flex flex-wrap gap-2">
+    @for (opt of filterOptions; track opt.value) {
+    <button (click)="setFilter(opt.value)" class="rounded-lg border mb-2 px-4 py-1.5 text-sm font-medium transition-colors"
+      [class.bg-primary]="activeFilter() === opt.value" [class.text-white]="activeFilter() === opt.value"
+      [class.border-primary]="activeFilter() === opt.value" [class.bg-white]="activeFilter() !== opt.value"
+      [class.text-gray-600]="activeFilter() !== opt.value" [class.border-gray-200]="activeFilter() !== opt.value">
+      {{ opt.label }}
+    </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+  <app-table-skeleton  [cols]="5" />
+  } @else {
+  <app-data-table [columns]="tableColumns" [data]="tableData()" />
+  }
+
+</div>

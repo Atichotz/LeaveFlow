@@ -1,0 +1,7 @@
+:host {
+  .calendar-cell {
+    &:nth-child(7n) {
+      border-right: none;
+    }
+  }
+}

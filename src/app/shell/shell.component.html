@@ -1,0 +1,25 @@
+<div class="flex h-screen overflow-hidden">
+
+  <!-- Mobile backdrop -->
+  @if (sidebarOpen()) {
+    <div
+      class="fixed inset-0 z-20 bg-black/40 md:hidden"
+      (click)="sidebarOpen.set(false)"
+    ></div>
+  }
+
+  <app-sidebar
+    [isOpen]="sidebarOpen()"
+    (closed)="sidebarOpen.set(false)"
+  />
+
+  <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+    <app-top-header (menuToggle)="toggleSidebar()" />
+    <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6">
+      <router-outlet />
+    </main>
+  </div>
+
+</div>
+
+<app-toast />

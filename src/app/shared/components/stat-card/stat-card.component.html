@@ -1,0 +1,16 @@
+<div class="card flex items-center gap-4 p-5 transition-shadow hover:shadow-md">
+  <div
+    [class]="iconBgClass()"
+    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl"
+  >
+    <fa-icon [icon]="icon()" [class]="iconColorClass()" class="text-xl" />
+  </div>
+
+  <div class="min-w-0 flex-1">
+    <p class="text-xs font-medium uppercase tracking-wider text-gray-400">{{ label() }}</p>
+    <p class="mt-0.5 text-3xl font-bold text-gray-900">{{ value() }}</p>
+    @if (subtext()) {
+      <p class="mt-0.5 text-xs text-gray-400">{{ subtext() }}</p>
+    }
+  </div>
+</div>

@@ -1,0 +1,127 @@
+<div class="flex flex-col gap-6 xl:flex-row">
+
+  <!-- Calendar -->
+  <div class="card flex-1 overflow-hidden">
+
+    <!-- Month navigation -->
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+      <button
+        class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+        (click)="prevMonth()"
+      >
+        <fa-icon [icon]="icons.prev" />
+      </button>
+      <span class="text-base font-semibold text-gray-800">{{ monthLabel() }}</span>
+      <button
+        class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+        (click)="nextMonth()"
+      >
+        <fa-icon [icon]="icons.next" />
+      </button>
+    </div>
+
+    <!-- Day-of-week header -->
+    <div class="grid grid-cols-7 border-b border-gray-100">
+      @for (day of dayNames; track day) {
+        <div class="py-2 text-center text-xs font-semibold text-gray-400">{{ day }}</div>
+      }
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="grid grid-cols-7">
+      @for (cell of calendarDays(); track cell.dateKey) {
+        @let leaves = getDayLeaves(cell.dateKey);
+        <button
+          class="calendar-cell relative min-h-14 border-b border-r border-gray-50 p-1.5 text-left transition-colors hover:bg-gray-50"
+          [class.bg-blue-50]="cell.isToday"
+          [class.bg-orange-50]="cell.isHoliday && !cell.isToday"
+          [class.ring-2]="selectedDate() === cell.dateKey"
+          [class.ring-inset]="selectedDate() === cell.dateKey"
+          [class.ring-primary]="selectedDate() === cell.dateKey"
+          (click)="selectDay(cell.dateKey)"
+        >
+          <!-- Day number -->
+          <span
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium"
+            [class.text-gray-300]="!cell.isCurrentMonth"
+            [class.text-gray-700]="cell.isCurrentMonth && !cell.isToday"
+            [class.bg-primary]="cell.isToday"
+            [class.text-white]="cell.isToday"
+          >
+            {{ cell.date.getDate() }}
+          </span>
+
+          <!-- Leave dots -->
+          @if (leaves.length > 0) {
+            <div class="mt-1 flex flex-wrap gap-0.5 px-0.5">
+              @for (req of leaves; track req.id) {
+                <span
+                  class="h-2 w-2 rounded-full"
+                  [class.bg-emerald-400]="req.status === 'approved'"
+                  [class.bg-amber-400]="req.status === 'pending'"
+                  [class.bg-red-400]="req.status === 'rejected'"
+                ></span>
+              }
+            </div>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- Legend -->
+    <div class="flex flex-wrap items-center gap-4 border-t border-gray-100 px-5 py-3">
+      <div class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> อนุมัติ
+      </div>
+      <div class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> รอดำเนินการ
+      </div>
+      <div class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span> ไม่อนุมัติ
+      </div>
+      <div class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="h-2.5 w-2.5 rounded-full bg-orange-200 ring-1 ring-orange-300"></span> วันหยุดนักขัตฤกษ์
+      </div>
+    </div>
+  </div>
+
+  <!-- Side panel -->
+  <div class="xl:w-64 xl:shrink-0">
+    @if (selectedDate()) {
+      <div class="card p-5">
+        <h3 class="section-title">{{ selectedDayLabel() }}</h3>
+        @if (selectedDateIsHoliday()) {
+          <p class="mt-2 text-xs font-medium text-orange-500">{{ selectedDateHolidayName() }}</p>
+        }
+        @if (selectedDayLeaves().length > 0) {
+          <ul class="mt-4 space-y-3">
+            @for (req of selectedDayLeaves(); track req.id) {
+              <li class="rounded-lg border border-gray-100 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-medium text-gray-800">{{ req.leaveTypeLabel }}</span>
+                  <span
+                    class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
+                    [class.bg-emerald-100]="req.status === 'approved'"
+                    [class.text-emerald-700]="req.status === 'approved'"
+                    [class.bg-amber-100]="req.status === 'pending'"
+                    [class.text-amber-700]="req.status === 'pending'"
+                    [class.bg-red-100]="req.status === 'rejected'"
+                    [class.text-red-700]="req.status === 'rejected'"
+                  >{{ statusLabel[req.status] }}</span>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">{{ req.totalDays }} วัน</p>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="mt-4 text-sm text-gray-400">ไม่มีการลาในวันนี้</p>
+        }
+      </div>
+    } @else {
+      <div class="card flex h-full min-h-40 items-center justify-center p-5">
+        <p class="text-center text-sm text-gray-400">คลิกที่วันในปฏิทิน<br>เพื่อดูรายละเอียด</p>
+      </div>
+    }
+  </div>
+
+</div>

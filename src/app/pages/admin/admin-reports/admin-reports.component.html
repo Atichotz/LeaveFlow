@@ -1,0 +1,160 @@
+<div class="space-y-8">
+
+  <!-- Page heading -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="page-title">รายงาน</h1>
+      <p class="mt-0.5 text-sm text-gray-500">สรุปสถิติการลาพนักงาน</p>
+    </div>
+    <button class="btn-outline flex w-full items-center justify-center gap-2 sm:w-auto sm:justify-start" (click)="exportCSV()">
+      <fa-icon [icon]="downloadIcon" />
+      Export CSV
+    </button>
+  </div>
+
+  <!-- Section 0: Charts -->
+  @if (!isLoading()) {
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+
+      <!-- Chart 1: Status trend -->
+      <div class="card p-5">
+        <h2 class="section-title mb-1">แนวโน้มตามสถานะ</h2>
+        <p class="mb-4 text-xs text-gray-400">จำนวนคำขอ (ทุกสถานะ) แยกตามเดือน</p>
+        <div class="w-full" style="height: 280px">
+          <ngx-charts-bar-vertical-2d
+            [results]="statusChartData()"
+            [scheme]="statusColorScheme"
+            [legend]="true"
+            [legendPosition]="legendBelow"
+            [xAxis]="true"
+            [yAxis]="true"
+            [roundDomains]="true"
+            [roundEdges]="true"
+            [groupPadding]="8"
+            [barPadding]="2"
+            [tooltipDisabled]="false"
+            [animations]="true"
+            [legendTitle]="''"
+          />
+        </div>
+      </div>
+
+      <!-- Chart 2: Leave type trend -->
+      <div class="card p-5">
+        <h2 class="section-title mb-1">แนวโน้มตามประเภทการลา</h2>
+        <p class="mb-4 text-xs text-gray-400">จำนวนคำขอแยกตามประเภท (ทุกสถานะ)</p>
+        <div class="w-full" style="height: 280px">
+          <ngx-charts-bar-vertical-2d
+            [results]="typeChartData()"
+            [scheme]="typeColorScheme"
+            [legend]="true"
+            [legendPosition]="legendBelow"
+            [xAxis]="true"
+            [yAxis]="true"
+            [roundDomains]="true"
+            [roundEdges]="true"
+            [groupPadding]="8"
+            [barPadding]="2"
+            [tooltipDisabled]="false"
+            [animations]="true"
+            [legendTitle]="''"
+          />
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Section 1: Monthly summary -->
+  <div class="!mt-[3rem]">
+    <h2 class="section-title mb-3">สรุปรายเดือน</h2>
+    @if (isLoading()) {
+      <app-table-skeleton [cols]="5" />
+    } @else {
+    <div class="table-wrapper">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="border-b border-gray-100 bg-gray-50">
+            <tr>
+              <th class="table-header-cell">เดือน</th>
+              <th class="table-header-cell text-right">อนุมัติ</th>
+              <th class="table-header-cell text-right">รอดำเนินการ</th>
+              <th class="table-header-cell text-right">ปฏิเสธ</th>
+              <th class="table-header-cell text-right">รวม</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            @for (row of monthlySummary(); track row.label) {
+              <tr class="table-row">
+                <td class="table-cell font-medium">{{ row.label }}</td>
+                <td class="table-cell text-right">
+                  <span class="font-semibold text-emerald-600">{{ row.approved }}</span>
+                </td>
+                <td class="table-cell text-right">
+                  <span class="font-semibold text-amber-600">{{ row.pending }}</span>
+                </td>
+                <td class="table-cell text-right">
+                  <span class="font-semibold text-red-500">{{ row.rejected }}</span>
+                </td>
+                <td class="table-cell text-right font-semibold text-gray-800">{{ row.total }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-400">ยังไม่มีข้อมูล</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Section 2: Per-employee summary (approved days only) -->
+  <div>
+    <h2 class="section-title mb-1">สรุปตามพนักงาน</h2>
+    <p class="mb-3 text-xs text-gray-400">นับเฉพาะคำขอที่อนุมัติแล้ว (จำนวนวัน)</p>
+    @if (isLoading()) {
+      <app-table-skeleton [cols]="7" />
+    } @else {
+    <div class="table-wrapper">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="border-b border-gray-100 bg-gray-50">
+            <tr>
+              <th class="table-header-cell">พนักงาน</th>
+              <th class="table-header-cell">แผนก</th>
+              <th class="table-header-cell text-right">ลาป่วย</th>
+              <th class="table-header-cell text-right">ลาพักร้อน</th>
+              <th class="table-header-cell text-right">ลากิจ</th>
+              <th class="table-header-cell text-right">อื่นๆ</th>
+              <th class="table-header-cell text-right">รวม</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            @for (row of employeeSummary(); track row.employeeId) {
+              <tr class="table-row">
+                <td class="table-cell">
+                  <p class="font-medium text-gray-800">{{ row.name }}</p>
+                  <p class="text-xs text-gray-400 font-mono">{{ row.employeeId }}</p>
+                </td>
+                <td class="table-cell text-gray-500">{{ row.department }}</td>
+                <td class="table-cell text-right">{{ row.sick || '–' }}</td>
+                <td class="table-cell text-right">{{ row.annual || '–' }}</td>
+                <td class="table-cell text-right">{{ row.personal || '–' }}</td>
+                <td class="table-cell text-right">{{ row.other || '–' }}</td>
+                <td class="table-cell text-right font-semibold text-gray-800">{{ row.total || '–' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-400">ยังไม่มีข้อมูล</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+  </div>
+
+</div>

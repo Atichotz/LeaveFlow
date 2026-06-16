@@ -1,0 +1,30 @@
+/* Mobile: sidebar hidden off-screen by default, slides in when .sidebar-open */
+@media (max-width: 767px) {
+  .sidebar-panel {
+    transform: translateX(-100%);
+
+    &.sidebar-open {
+      transform: translateX(0);
+    }
+  }
+}
+
+.sidebar-panel {
+  background: linear-gradient(180deg, #1E3A5F 0%, #0F2744 100%);
+}
+
+/* Active nav item — left accent indicator */
+nav a.nav-active {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    bottom: 5px;
+    width: 3px;
+    background-color: #93c5fd;
+    border-radius: 0 3px 3px 0;
+  }
+}

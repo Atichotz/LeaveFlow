@@ -1,0 +1,84 @@
+<header class="flex-shrink-0 bg-white shadow-sm">
+
+  <!-- Main header row -->
+  <div class="flex h-16 items-center justify-between px-4 md:px-6">
+
+    <div class="flex items-center gap-3">
+      <!-- Hamburger (mobile only) -->
+      <button
+        class="rounded-xl p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 cursor-pointer md:hidden"
+        (click)="menuToggle.emit()"
+        aria-label="เปิด/ปิดเมนู"
+      >
+        <fa-icon [icon]="menuIcon" />
+      </button>
+
+      <!-- Search toggle icon (mobile only) -->
+      <button
+        class="rounded-xl p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 cursor-pointer md:hidden"
+        (click)="toggleMobileSearch()"
+        aria-label="ค้นหา"
+      >
+        <fa-icon [icon]="showMobileSearch() ? closeIcon : searchIcon" />
+      </button>
+
+      <!-- Search (desktop) -->
+      <div class="relative hidden w-72 md:block">
+        <fa-icon
+          [icon]="searchIcon"
+          class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"
+        />
+        <input
+          type="text"
+          placeholder="ค้นหา..."
+          class="form-input w-full pl-9"
+        />
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="flex items-center gap-2">
+
+      <!-- Notification bell -->
+      <button class="relative rounded-xl p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 cursor-pointer">
+        <fa-icon [icon]="bellIcon" class="text-lg" />
+        <span class="absolute right-1.5 top-1.5 flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+        </span>
+      </button>
+
+      <!-- Divider -->
+      <div class="h-6 w-px bg-gray-200"></div>
+
+      <!-- User info -->
+      @if (auth.currentUser(); as user) {
+        <div class="flex items-center gap-2.5 pl-1">
+          <app-avatar [user]="user" size="sm" />
+          <div class="hidden sm:block">
+            <p class="text-sm font-semibold text-gray-800">{{ user.name }}</p>
+            <p class="text-xs text-gray-400">{{ user.department }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Mobile search row (toggled by search icon) -->
+  @if (showMobileSearch()) {
+    <div class="border-t border-gray-100 px-4 pb-3 pt-2 md:hidden">
+      <div class="relative">
+        <fa-icon
+          [icon]="searchIcon"
+          class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"
+        />
+        <input
+          type="text"
+          placeholder="ค้นหา..."
+          class="form-input w-full pl-9"
+        />
+      </div>
+    </div>
+  }
+
+</header>
