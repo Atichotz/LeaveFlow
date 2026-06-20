@@ -1,7 +1,7 @@
 <div class="space-y-6">
 
   <!-- Page heading -->
-  <div class="flex items-baseline justify-between">
+  <div class="flex items-baseline justify-between animate-fade-in-up">
     <div>
       <h1 class="page-title">คำขอลา</h1>
       <p class="mt-0.5 text-sm text-gray-500">คำขอที่รอการอนุมัติ</p>
@@ -42,17 +42,19 @@
   <!-- Approval cards grid -->
   @if (!isLoading() && pendingRequests().length > 0) {
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      @for (req of pendingRequests(); track req.id) {
+      @for (req of pendingRequests(); track req.id; let i = $index) {
         <app-approval-card
           [request]="req"
           (approve)="onApprove(req.id)"
           (reject)="openRejectDialog(req.id)"
+          class="animate-fade-in-up"
+          [style.animation-delay]="i * 75 + 'ms'"
         />
       }
     </div>
   } @else if (!isLoading()) {
     <!-- Empty state -->
-    <div class="flex flex-col items-center justify-center py-24 text-center">
+    <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
       <div class="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-400">
         <fa-icon [icon]="emptyIcon" class="text-2xl" />
       </div>

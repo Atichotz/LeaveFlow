@@ -1,26 +1,373 @@
 <div class="space-y-6">
 
-  <div>
-    <h1 class="page-title">ประวัติการลา</h1>
-    <p class="mt-0.5 text-sm text-gray-500">รายการคำขอลาทั้งหมดของคุณ</p>
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="page-title">ประวัติการลา</h1>
+      <p class="mt-0.5 text-sm text-gray-500">ตรวจสอบประวัติการลาทั้งหมดของคุณ</p>
+    </div>
+    <button class="btn-primary flex shrink-0 items-center gap-2" routerLink="/employee/request">
+      <fa-icon [icon]="faPlus" />
+      ส่งคำขอลาใหม่
+    </button>
   </div>
 
-  <!-- Filter tabs -->
-  <div class="flex flex-wrap gap-2">
-    @for (opt of filterOptions; track opt.value) {
-    <button (click)="setFilter(opt.value)" class="rounded-lg border mb-2 px-4 py-1.5 text-sm font-medium transition-colors"
-      [class.bg-primary]="activeFilter() === opt.value" [class.text-white]="activeFilter() === opt.value"
-      [class.border-primary]="activeFilter() === opt.value" [class.bg-white]="activeFilter() !== opt.value"
-      [class.text-gray-600]="activeFilter() !== opt.value" [class.border-gray-200]="activeFilter() !== opt.value">
-      {{ opt.label }}
-    </button>
-    }
+  <!-- Summary cards -->
+  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100">
+        <fa-icon [icon]="faCalendarDays" class="text-xl text-primary" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">ลาทั้งหมด</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ summaryStats().totalDays }}
+          <span class="text-sm font-normal text-gray-500">วัน</span>
+        </p>
+        <p class="text-xs text-gray-400">จากทั้งหมด {{ leaveBalanceSummary().total }} วัน</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100">
+        <fa-icon [icon]="faCircleCheck" class="text-xl text-emerald-600" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">อนุมัติแล้ว</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ summaryStats().approvedDays }}
+          <span class="text-sm font-normal text-gray-500">วัน</span>
+        </p>
+        <p class="text-xs text-gray-400">{{ summaryStats().approvedCount }} รายการ</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100">
+        <fa-icon [icon]="faClock" class="text-xl text-amber-600" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">รออนุมัติ</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ summaryStats().pendingDays }}
+          <span class="text-sm font-normal text-gray-500">วัน</span>
+        </p>
+        <p class="text-xs text-gray-400">{{ summaryStats().pendingCount }} รายการ</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-100">
+        <fa-icon [icon]="faCircleXmark" class="text-xl text-red-500" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">ไม่อนุมัติ</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ summaryStats().rejectedDays }}
+          <span class="text-sm font-normal text-gray-500">วัน</span>
+        </p>
+        <p class="text-xs text-gray-400">{{ summaryStats().rejectedCount }} รายการ</p>
+      </div>
+    </div>
+
   </div>
 
   @if (isLoading()) {
-  <app-table-skeleton  [cols]="5" />
+  <app-table-skeleton [cols]="8" />
   } @else {
-  <app-data-table [columns]="tableColumns" [data]="tableData()" />
+
+  <!-- Main layout: table + sidebar -->
+  <div class="flex gap-6">
+
+    <!-- Left: table section -->
+    <div class="min-w-0 flex-1 space-y-4">
+
+      <!-- Filter bar -->
+      <div class="card p-4">
+        <div class="flex flex-wrap items-end gap-3">
+
+          <div class="form-field">
+            <label class="form-label text-xs">ประเภทการลา</label>
+            <select class="form-input"
+              [ngModel]="filterType()"
+              (ngModelChange)="filterType.set($event); resetPage()">
+              @for (opt of leaveTypeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label text-xs">สถานะ</label>
+            <select class="form-input"
+              [ngModel]="filterStatus()"
+              (ngModelChange)="filterStatus.set($event); resetPage()">
+              @for (opt of statusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field min-w-[200px] flex-1">
+            <label class="form-label text-xs">ค้นหา</label>
+            <div class="relative">
+              <fa-icon [icon]="faSearch"
+                class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400" />
+              <input type="text" class="form-input w-full pl-9"
+                placeholder="ค้นหาเหตุผล, ผู้อนุมัติ"
+                [ngModel]="searchText()"
+                (ngModelChange)="searchText.set($event); resetPage()" />
+            </div>
+          </div>
+
+          <button class="btn-outline flex items-center gap-2" (click)="clearFilters()">
+            <fa-icon [icon]="faRotateLeft" class="text-xs" />
+            ล้างตัวกรอง
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="table-header-cell">วันที่ยื่น</th>
+                <th class="table-header-cell">ประเภทการลา</th>
+                <th class="table-header-cell">วันที่ลา</th>
+                <th class="table-header-cell">จำนวนวัน</th>
+                <th class="table-header-cell">เหตุผล</th>
+                <th class="table-header-cell">ผู้อนุมัติ</th>
+                <th class="table-header-cell">สถานะ</th>
+                <th class="table-header-cell">รายละเอียด</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+              @for (row of paginatedHistory(); track row.id) {
+              <tr class="table-row">
+
+                <td class="table-cell text-gray-500">
+                  {{ formatDate(row.createdAt) }}
+                </td>
+
+                <td class="table-cell">
+                  <div class="flex items-center gap-2.5">
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                      [class]="leaveTypeIconMap[row.leaveType].bgClass">
+                      <fa-icon [icon]="leaveTypeIconMap[row.leaveType].icon"
+                        [class]="leaveTypeIconMap[row.leaveType].iconClass" class="text-sm" />
+                    </div>
+                    <span class="whitespace-nowrap">{{ row.leaveTypeLabel }}</span>
+                  </div>
+                </td>
+
+                <td class="table-cell whitespace-nowrap">
+                  {{ formatDate(row.startDate) }}
+                  @if (!isSameDay(row.startDate, row.endDate)) {
+                  – {{ formatDate(row.endDate) }}
+                  }
+                </td>
+
+                <td class="table-cell whitespace-nowrap">{{ row.totalDays }} วัน</td>
+
+                <td class="table-cell max-w-[160px]">
+                  <span class="block truncate" [title]="row.reason">{{ row.reason }}</span>
+                </td>
+
+                <td class="table-cell">
+                  @if (row.reviewedBy) {
+                  <div class="flex items-center gap-2">
+                    <app-avatar [user]="row.reviewedBy" size="sm" />
+                    <div class="min-w-0">
+                      <p class="truncate text-sm font-medium text-gray-700">{{ row.reviewedBy.name }}</p>
+                      <p class="truncate text-xs text-gray-400">{{ row.reviewedBy.position }}</p>
+                    </div>
+                  </div>
+                  } @else {
+                  <span class="text-gray-400">–</span>
+                  }
+                </td>
+
+                <td class="table-cell">
+                  <app-status-badge [status]="row.status" />
+                </td>
+
+                <td class="table-cell">
+                  <button class="text-sm font-medium text-primary transition-colors hover:text-primary-hover">
+                    ดูรายละเอียด
+                  </button>
+                </td>
+
+              </tr>
+              }
+
+              @if (paginatedHistory().length === 0) {
+              <tr>
+                <td colspan="8" class="table-cell py-12 text-center text-gray-400">ไม่มีข้อมูล</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between px-1 text-sm text-gray-500">
+        <span>
+          แสดง
+          {{ (currentPage() - 1) * pageSize() + 1 }}–{{ Math.min(currentPage() * pageSize(), filteredHistory().length) }}
+          จาก {{ filteredHistory().length }} รายการ
+        </span>
+        <div class="flex items-center gap-1">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() === 1"
+            (click)="setPage(currentPage() - 1)">
+            <fa-icon [icon]="faChevronLeft" class="text-xs" />
+          </button>
+
+          @for (p of pageNumbers(); track p) {
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg border text-sm font-medium transition-colors"
+            [class.bg-primary]="p === currentPage()"
+            [class.text-white]="p === currentPage()"
+            [class.border-primary]="p === currentPage()"
+            [class.bg-white]="p !== currentPage()"
+            [class.text-gray-700]="p !== currentPage()"
+            [class.border-gray-200]="p !== currentPage()"
+            [class.hover:bg-gray-50]="p !== currentPage()"
+            (click)="setPage(p)">
+            {{ p }}
+          </button>
+          }
+
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() === totalPages()"
+            (click)="setPage(currentPage() + 1)">
+            <fa-icon [icon]="faChevronRight" class="text-xs" />
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="w-72 shrink-0 space-y-4">
+
+      <!-- Mini calendar -->
+      <div class="card p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <span class="text-sm font-semibold text-gray-800">ปฏิทินการลา</span>
+          <div class="flex items-center gap-1">
+            <button class="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              (click)="prevMonth()">
+              <fa-icon [icon]="faChevronLeft" class="text-xs" />
+            </button>
+            <span class="min-w-[100px] text-center text-xs text-gray-500">{{ calendarMonthLabel() }}</span>
+            <button class="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              (click)="nextMonth()">
+              <fa-icon [icon]="faChevronRight" class="text-xs" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Day of week header -->
+        <div class="mb-1 grid grid-cols-7 text-center">
+          @for (dow of DOW_LABELS; track dow) {
+          <div class="py-1 text-xs font-medium text-gray-400">{{ dow }}</div>
+          }
+        </div>
+
+        <!-- Calendar grid -->
+        @for (week of calendarWeeks(); track $index) {
+        <div class="grid grid-cols-7 text-center">
+          @for (day of week; track day.date.toDateString()) {
+          <div class="relative flex flex-col items-center py-0.5">
+            <span class="flex h-7 w-7 items-center justify-center rounded-full text-xs transition-colors"
+              [class.font-bold]="day.isCurrentMonth"
+              [class.text-gray-800]="day.isCurrentMonth && !day.isToday && !day.leaveStatus"
+              [class.text-gray-300]="!day.isCurrentMonth"
+              [class.bg-primary]="day.isToday && !day.leaveStatus"
+              [class.text-white]="day.isToday && !day.leaveStatus"
+              [class.bg-emerald-500]="day.leaveStatus === 'approved'"
+              [class.bg-amber-400]="day.leaveStatus === 'pending'"
+              [class.bg-red-400]="day.leaveStatus === 'rejected'"
+              [class.text-white]="day.leaveStatus !== undefined">
+              {{ day.date.getDate() }}
+            </span>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Legend -->
+        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-gray-100 pt-3">
+          <div class="flex items-center gap-1.5">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+            <span class="text-xs text-gray-500">อนุมัติแล้ว</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+            <span class="text-xs text-gray-500">รออนุมัติ</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span>
+            <span class="text-xs text-gray-500">ไม่อนุมัติ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leave summary donut chart -->
+      <div class="card p-4">
+        <div class="mb-4 flex items-center justify-between">
+          <span class="text-sm font-semibold text-gray-800">สรุปการลา (ปี {{ currentThaiYear }})</span>
+        </div>
+
+        <div class="relative mx-auto h-32 w-32">
+          <svg viewBox="0 0 100 100" class="h-full w-full -rotate-90">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" stroke-width="12" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="12"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="donutChart().circumference"
+              [attr.stroke-dashoffset]="donutChart().offset" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-gray-900">{{ leaveBalanceSummary().used }}</span>
+            <span class="text-xs text-gray-400">วัน</span>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-gray-200"></span>
+              <span class="text-sm text-gray-500">คงเหลือ</span>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-semibold text-gray-700">{{ leaveBalanceSummary().remaining }} วัน</span>
+              <span class="ml-1 text-xs text-gray-400">({{ 100 - leaveBalanceSummary().usedPct }}%)</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-primary"></span>
+              <span class="text-sm text-gray-500">ใช้ไป</span>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-semibold text-gray-700">{{ leaveBalanceSummary().used }} วัน</span>
+              <span class="ml-1 text-xs text-gray-400">({{ leaveBalanceSummary().usedPct }}%)</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between border-t border-gray-100 pt-2">
+            <span class="text-sm text-gray-500">ทั้งหมด</span>
+            <span class="text-sm font-semibold text-gray-700">{{ leaveBalanceSummary().total }} วัน</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
   }
 
 </div>

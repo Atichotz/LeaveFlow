@@ -1,37 +1,140 @@
 <div class="space-y-6">
 
-  <!-- Page heading -->
+  <!-- Header -->
   <div>
     <h1 class="page-title">ปฏิทินการลา</h1>
     <p class="mt-0.5 text-sm text-gray-500">ภาพรวมการลาพนักงานรายเดือน</p>
   </div>
 
+  <!-- Stats cards -->
+  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100">
+        <fa-icon [icon]="icons.users" class="text-xl text-primary" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">ลาวันนี้</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ todayLeaveCount() }}
+          <span class="text-sm font-normal text-gray-500">คน</span>
+        </p>
+        <p class="text-xs text-gray-400">ณ วันนี้</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100">
+        <fa-icon [icon]="icons.clock" class="text-xl text-amber-600" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">รออนุมัติ</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ pendingCount() }}
+          <span class="text-sm font-normal text-gray-500">รายการ</span>
+        </p>
+        <p class="text-xs text-gray-400">ต้องดำเนินการ</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100">
+        <fa-icon [icon]="icons.calCheck" class="text-xl text-emerald-600" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">อนุมัติแล้วเดือนนี้</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ approvedThisMonth() }}
+          <span class="text-sm font-normal text-gray-500">รายการ</span>
+        </p>
+        <p class="text-xs text-gray-400">เดือนปัจจุบัน</p>
+      </div>
+    </div>
+
+    <div class="card flex items-center gap-4 p-5">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100">
+        <fa-icon [icon]="icons.calDays" class="text-xl text-orange-500" />
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">วันหยุดเดือนนี้</p>
+        <p class="mt-0.5 text-2xl font-bold text-gray-900">
+          {{ holidaysThisMonth() }}
+          <span class="text-sm font-normal text-gray-500">วัน</span>
+        </p>
+        <p class="text-xs text-gray-400">นักขัตฤกษ์</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Calendar + side panel -->
   <div class="flex flex-col gap-6 xl:flex-row">
 
-    <!-- Calendar -->
+    <!-- Calendar card -->
     <div class="card flex-1 overflow-hidden">
 
-      <!-- Month navigation -->
-      <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-        <button
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-          (click)="prevMonth()"
-        >
-          <fa-icon [icon]="icons.prev" />
-        </button>
-        <span class="text-base font-semibold text-gray-800">{{ monthLabel() }}</span>
-        <button
-          class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-          (click)="nextMonth()"
-        >
-          <fa-icon [icon]="icons.next" />
-        </button>
+      <!-- Calendar toolbar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+
+        <!-- Month navigation -->
+        <div class="flex items-center gap-1">
+          <button
+            class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100"
+            (click)="prevMonth()">
+            <fa-icon [icon]="icons.prev" class="text-xs" />
+          </button>
+          <span class="w-36 text-center text-base font-semibold text-gray-800">{{ monthLabel() }}</span>
+          <button
+            class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100"
+            (click)="nextMonth()">
+            <fa-icon [icon]="icons.next" class="text-xs" />
+          </button>
+        </div>
+
+        <!-- Status filter + Today button -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center rounded-xl border border-gray-200 bg-white p-0.5 text-xs">
+            <button
+              class="rounded-lg px-3 py-1.5 font-medium transition-colors"
+              [class.bg-primary]="statusFilter() === 'all'"
+              [class.text-white]="statusFilter() === 'all'"
+              [class.text-gray-600]="statusFilter() !== 'all'"
+              (click)="setStatusFilter('all')">
+              ทั้งหมด
+            </button>
+            <button
+              class="rounded-lg px-3 py-1.5 font-medium transition-colors"
+              [class.bg-emerald-500]="statusFilter() === 'approved'"
+              [class.text-white]="statusFilter() === 'approved'"
+              [class.text-gray-600]="statusFilter() !== 'approved'"
+              (click)="setStatusFilter('approved')">
+              อนุมัติ
+            </button>
+            <button
+              class="rounded-lg px-3 py-1.5 font-medium transition-colors"
+              [class.bg-amber-500]="statusFilter() === 'pending'"
+              [class.text-white]="statusFilter() === 'pending'"
+              [class.text-gray-600]="statusFilter() !== 'pending'"
+              (click)="setStatusFilter('pending')">
+              รออนุมัติ
+            </button>
+          </div>
+
+          <button
+            class="btn-outline text-xs"
+            [class.opacity-40]="isCurrentDisplayedMonth()"
+            [disabled]="isCurrentDisplayedMonth()"
+            (click)="goToToday()">
+            วันนี้
+          </button>
+        </div>
+
       </div>
 
       <!-- Day-of-week header -->
-      <div class="grid grid-cols-7 border-b border-gray-100">
+      <div class="grid grid-cols-7 border-b border-gray-100 bg-gray-50">
         @for (day of dayNames; track day) {
-          <div class="py-2 text-center text-xs font-semibold text-gray-400">{{ day }}</div>
+        <div class="py-2.5 text-center text-xs font-semibold text-gray-400">{{ day }}</div>
         }
       </div>
 
@@ -40,94 +143,173 @@
         @for (cell of calendarDays(); track cell.dateKey) {
           @let leaves = getDayLeaves(cell.dateKey);
           <button
-            class="calendar-cell group relative min-h-14 border-b border-r border-gray-50 p-1.5 text-left transition-colors hover:bg-gray-50"
-            [class.bg-blue-50]="cell.isToday"
+            class="calendar-cell group relative min-h-[6.5rem] border-b border-r border-gray-50 p-1.5 text-left transition-colors hover:bg-slate-50"
+            [class.bg-blue-50]="cell.isToday && statusFilter() === 'all'"
             [class.bg-orange-50]="cell.isHoliday && !cell.isToday"
             [class.ring-2]="selectedDate() === cell.dateKey"
             [class.ring-inset]="selectedDate() === cell.dateKey"
             [class.ring-primary]="selectedDate() === cell.dateKey"
-            (click)="selectDay(cell.dateKey)"
-          >
-            <!-- Day number -->
-            <span
-              class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium"
-              [class.text-gray-300]="!cell.isCurrentMonth"
-              [class.text-gray-700]="cell.isCurrentMonth && !cell.isToday"
-              [class.bg-primary]="cell.isToday"
-              [class.text-white]="cell.isToday"
-            >
-              {{ cell.date.getDate() }}
-            </span>
+            (click)="selectDay(cell.dateKey)">
 
-            <!-- Leave dots -->
-            @if (leaves.length > 0) {
-              <div class="mt-1 flex flex-wrap gap-0.5 px-0.5">
-                @if (hasApproved(leaves)) {
-                  <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                }
-                @if (hasPending(leaves)) {
-                  <span class="h-2 w-2 rounded-full bg-amber-400"></span>
-                }
-                @if (leaves.length > 1) {
-                  <span class="text-xs text-gray-400 leading-none">+{{ leaves.length }}</span>
-                }
+            <!-- Date row: number + holiday indicator -->
+            <div class="mb-1 flex items-start justify-between">
+              <span
+                class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium"
+                [class.text-gray-300]="!cell.isCurrentMonth"
+                [class.text-gray-700]="cell.isCurrentMonth && !cell.isToday"
+                [class.bg-primary]="cell.isToday"
+                [class.text-white]="cell.isToday">
+                {{ cell.date.getDate() }}
+              </span>
+              @if (cell.isHoliday && cell.isCurrentMonth) {
+              <span class="mt-0.5 h-1.5 w-1.5 rounded-full bg-orange-400 shrink-0"></span>
+              }
+            </div>
+
+            <!-- Leave bars (max 2 visible) -->
+            <div class="space-y-0.5">
+              @for (req of leaves.slice(0, MAX_CELL_VISIBLE); track req.id) {
+              <div
+                class="truncate rounded px-1.5 py-0.5 text-xs leading-tight"
+                [class.bg-emerald-100]="req.status === 'approved'"
+                [class.text-emerald-700]="req.status === 'approved'"
+                [class.bg-amber-100]="req.status === 'pending'"
+                [class.text-amber-700]="req.status === 'pending'">
+                {{ req.employee.name.split(' ')[0] }}
               </div>
-            }
+              }
+              @if (leaves.length > MAX_CELL_VISIBLE) {
+              <div class="px-1 text-xs text-gray-400">+{{ leaves.length - MAX_CELL_VISIBLE }} เพิ่มเติม</div>
+              }
+            </div>
+
           </button>
         }
       </div>
 
       <!-- Legend -->
-      <div class="flex items-center gap-4 border-t border-gray-100 px-5 py-3">
+      <div class="flex flex-wrap items-center gap-4 border-t border-gray-100 px-5 py-3">
         <div class="flex items-center gap-1.5 text-xs text-gray-500">
-          <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> อนุมัติ
+          <span class="h-3 w-3 rounded bg-emerald-100 ring-1 ring-emerald-300"></span>อนุมัติแล้ว
         </div>
         <div class="flex items-center gap-1.5 text-xs text-gray-500">
-          <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> รอดำเนินการ
+          <span class="h-3 w-3 rounded bg-amber-100 ring-1 ring-amber-300"></span>รออนุมัติ
         </div>
         <div class="flex items-center gap-1.5 text-xs text-gray-500">
-          <span class="h-2.5 w-2.5 rounded-full bg-orange-200 ring-1 ring-orange-300"></span> วันหยุดนักขัตฤกษ์
+          <span class="h-2.5 w-2.5 rounded-full bg-orange-400"></span>วันหยุดนักขัตฤกษ์
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-gray-500">
+          <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">1</span>วันนี้
         </div>
       </div>
+
     </div>
 
-    <!-- Side panel: stacks below calendar on mobile, fixed-width column on xl+ -->
-    <div class="xl:w-72 xl:shrink-0">
+    <!-- Side panel -->
+    <div class="xl:w-80 xl:shrink-0">
+
       @if (selectedDate()) {
-        <div class="card p-5">
+
+      <!-- Selected day detail -->
+      <div class="card overflow-hidden">
+        <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h3 class="section-title">{{ selectedDayLabel() }}</h3>
+          <button
+            class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            (click)="selectDay(selectedDate()!)">
+            ✕
+          </button>
+        </div>
+
+        <div class="p-5">
+          @if (selectedDateHolidayName()) {
+          <div class="mb-4 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2.5">
+            <span class="h-2 w-2 rounded-full bg-orange-400 shrink-0"></span>
+            <span class="text-xs text-orange-700">
+              <span class="font-semibold">วันหยุดนักขัตฤกษ์ —</span> {{ selectedDateHolidayName() }}
+            </span>
+          </div>
+          }
+
           @if (selectedDayLeaves().length > 0) {
-            <ul class="mt-4 space-y-3">
-              @for (req of selectedDayLeaves(); track req.id) {
-                <li class="flex items-center gap-3">
-                  <app-avatar [user]="req.employee" size="sm" />
-                  <div class="min-w-0">
-                    <p class="truncate text-sm font-medium text-gray-800">{{ req.employee.name }}</p>
-                    <p class="text-xs text-gray-500">{{ req.leaveTypeLabel }}</p>
-                  </div>
-                  <span
-                    class="ml-auto shrink-0 h-2 w-2 rounded-full"
-                    [class.bg-emerald-400]="req.status === 'approved'"
-                    [class.bg-amber-400]="req.status === 'pending'"
-                  ></span>
-                </li>
+          <ul class="space-y-3">
+            @for (req of selectedDayLeaves(); track req.id) {
+            <li class="rounded-xl border border-gray-100 p-3 transition-colors hover:bg-gray-50">
+              <div class="mb-2 flex items-center gap-2.5">
+                <app-avatar [user]="req.employee" size="sm" />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-gray-800">{{ req.employee.name }}</p>
+                  <p class="text-xs text-gray-400">{{ req.employee.department }}</p>
+                </div>
+                <app-status-badge [status]="req.status" />
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-500">{{ req.leaveTypeLabel }}</span>
+                <span class="font-medium text-gray-700">{{ req.totalDays }} วัน</span>
+              </div>
+              @if (req.reason) {
+              <p class="mt-1 truncate text-xs text-gray-400" [title]="req.reason">{{ req.reason }}</p>
               }
-            </ul>
+            </li>
+            }
+          </ul>
           } @else {
-            <p class="mt-4 text-sm text-gray-400">
-              @if (selectedDateIsHoliday()) {
-                วันหยุดนักขัตฤกษ์ — ไม่มีการลา
-              } @else {
-                ไม่มีการลาในวันนี้
-              }
-            </p>
+          <p class="py-6 text-center text-sm text-gray-400">ไม่มีการลาในวันนี้</p>
           }
         </div>
+      </div>
+
       } @else {
-        <div class="card flex h-full min-h-40 items-center justify-center p-5">
-          <p class="text-sm text-gray-400 text-center">คลิกที่วันในปฏิทิน<br>เพื่อดูรายชื่อผู้ลา</p>
+
+      <!-- Upcoming leaves (next 7 days) -->
+      <div class="card overflow-hidden">
+        <div class="border-b border-gray-100 px-5 py-4">
+          <h3 class="section-title">การลาที่จะมาถึง</h3>
+          <p class="mt-0.5 text-xs text-gray-400">7 วันข้างหน้า</p>
         </div>
+
+        <div class="p-5">
+          @if (upcomingLeaves().length > 0) {
+          <div class="space-y-5">
+            @for (group of upcomingLeaves(); track group.dateKey) {
+            <div>
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {{ group.label }}
+              </p>
+              <ul class="space-y-2">
+                @for (req of group.leaves; track req.id) {
+                <li class="flex items-center gap-2.5">
+                  <app-avatar [user]="req.employee" size="sm" />
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-gray-700">{{ req.employee.name }}</p>
+                    <p class="text-xs text-gray-400">{{ req.leaveTypeLabel }}</p>
+                  </div>
+                  <span
+                    class="h-2 w-2 shrink-0 rounded-full"
+                    [class.bg-emerald-400]="req.status === 'approved'"
+                    [class.bg-amber-400]="req.status === 'pending'">
+                  </span>
+                </li>
+                }
+              </ul>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="flex flex-col items-center py-8 text-center">
+            <p class="text-sm text-gray-400">ไม่มีการลาใน 7 วันข้างหน้า</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Hint -->
+      <p class="mt-3 text-center text-xs text-gray-400">
+        คลิกที่วันในปฏิทินเพื่อดูรายชื่อผู้ลา
+      </p>
+
       }
+
     </div>
 
   </div>

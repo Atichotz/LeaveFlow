@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Noto Sans Thai', 'sans-serif'],
+      },
       colors: {
         sidebar: {
           DEFAULT: '#1E3A5F',

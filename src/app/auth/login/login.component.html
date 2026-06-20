@@ -5,18 +5,18 @@
     style="background: linear-gradient(150deg, #1E3A5F 0%, #0F2744 100%);">
 
     <!-- Decorative blobs -->
-    <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-28 -left-12 h-80 w-80 rounded-full bg-blue-600/15 blur-3xl"></div>
+    <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl animate-blob"></div>
+    <div class="pointer-events-none absolute -bottom-28 -left-12 h-80 w-80 rounded-full bg-blue-600/15 blur-3xl animate-blob [animation-delay:3.5s]"></div>
 
     <!-- Logo -->
-    <div class="relative flex items-center gap-3">
+    <div class="relative flex items-center gap-3 animate-fade-in">
       <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-sm font-bold text-white"
         style="font-family: 'Poppins', sans-serif;">LF</div>
       <span class="text-xl font-bold text-white" style="font-family: 'Poppins', sans-serif;">LeaveFlow</span>
     </div>
 
     <!-- Hero content -->
-    <div class="relative">
+    <div class="relative animate-fade-in-up [animation-delay:100ms]">
       <h1 class="text-4xl font-bold leading-snug text-white" style="font-family: 'Poppins', sans-serif;">
         จัดการ<br />การลางาน<br />ให้ง่ายขึ้น
       </h1>
@@ -24,22 +24,22 @@
         ระบบจัดการการลาสำหรับองค์กร — ยื่นคำขอ ติดตามสถานะ และอนุมัติได้จากทุกที่
       </p>
       <div class="mt-8 space-y-3">
-        <div class="flex items-center gap-3 text-sm text-white/65">
+        <div class="flex items-center gap-3 text-sm text-white/65 animate-fade-in [animation-delay:250ms]">
           <div class="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300"></div>
           ยื่นคำขอลาออนไลน์ ไม่ต้องใช้กระดาษ
         </div>
-        <div class="flex items-center gap-3 text-sm text-white/65">
+        <div class="flex items-center gap-3 text-sm text-white/65 animate-fade-in [animation-delay:350ms]">
           <div class="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300"></div>
           ติดตามสถานะการลาแบบ Realtime
         </div>
-        <div class="flex items-center gap-3 text-sm text-white/65">
+        <div class="flex items-center gap-3 text-sm text-white/65 animate-fade-in [animation-delay:450ms]">
           <div class="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300"></div>
           HR อนุมัติง่าย จากทุกที่ทุกเวลา
         </div>
       </div>
     </div>
 
-    <p class="relative text-xs text-white/25">© 2026 LeaveFlow. All rights reserved.</p>
+    <p class="relative text-xs text-white/25 animate-fade-in [animation-delay:500ms]">© 2026 LeaveFlow. All rights reserved.</p>
   </div>
 
   <!-- Right panel -->
@@ -47,7 +47,7 @@
     <div class="w-full max-w-sm">
 
       <!-- Mobile branding -->
-      <div class="mb-6 lg:hidden">
+      <div class="mb-6 lg:hidden animate-fade-in">
         <div class="flex items-center gap-2.5">
           <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-sidebar text-xs font-bold text-white"
             style="font-family: 'Poppins', sans-serif;">LF</div>
@@ -56,7 +56,7 @@
       </div>
 
       <!-- Form card -->
-      <div class="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+      <div class="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm animate-fade-in-up [animation-delay:150ms]">
         <div class="mb-7">
           <h2 class="text-2xl font-bold text-gray-900" style="font-family: 'Poppins', sans-serif;">เข้าสู่ระบบ</h2>
           <p class="mt-1 text-sm text-gray-400">ใช้รหัสพนักงานและรหัสผ่านของคุณ</p>
@@ -94,13 +94,13 @@
 
           <!-- Error message -->
           @if (errorMessage()) {
-          <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 animate-fade-in">
             {{ errorMessage() }}
           </div>
           }
 
           <!-- Submit -->
-          <button type="submit" [disabled]="isLoading()" class="btn-primary w-full justify-center py-2.5">
+          <button type="submit" [disabled]="isLoading()" class="btn-primary w-full justify-center py-2.5 active:scale-95 transition-transform">
             @if (isLoading()) {
             <fa-icon [icon]="spinnerIcon" class="mr-2 animate-spin" />
             กำลังเข้าสู่ระบบ...
@@ -112,7 +112,7 @@
         </form>
       </div>
 
-      <p class="mt-5 text-center text-xs text-gray-400">
+      <p class="mt-5 text-center text-xs text-gray-400 animate-fade-in [animation-delay:300ms]">
         รหัสผ่านทดสอบ: <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono">password</code>
       </p>
     </div>

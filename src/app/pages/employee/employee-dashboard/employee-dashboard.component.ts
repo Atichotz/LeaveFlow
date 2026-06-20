@@ -1,5 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faClock, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { LeaveService } from '../../../core/services/leave.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LeaveBalanceCardComponent } from './leave-balance-card/leave-balance-card.component';
@@ -7,12 +10,23 @@ import { LeaveCalendarComponent } from './leave-calendar/leave-calendar.componen
 import { DataTableComponent, ColumnDef } from '../../../shared/components/data-table/data-table.component';
 import { StatCardSkeletonComponent } from '../../../shared/components/skeleton/stat-card-skeleton.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton.component';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 const RECENT_LIMIT = 5;
 
 @Component({
   selector: 'app-employee-dashboard',
-  imports: [RouterLink, LeaveBalanceCardComponent, LeaveCalendarComponent, DataTableComponent, StatCardSkeletonComponent, TableSkeletonComponent],
+  imports: [
+    RouterLink,
+    NgClass,
+    FontAwesomeModule,
+    LeaveBalanceCardComponent,
+    LeaveCalendarComponent,
+    DataTableComponent,
+    StatCardSkeletonComponent,
+    TableSkeletonComponent,
+    AvatarComponent,
+  ],
   templateUrl: './employee-dashboard.component.html',
   styleUrl: './employee-dashboard.component.scss'
 })
@@ -22,14 +36,23 @@ export class EmployeeDashboardComponent {
   constructor() {
     setTimeout(() => this.isLoading.set(false), 800);
   }
+
   readonly auth = inject(AuthService);
   private readonly leaveService = inject(LeaveService);
 
   readonly balances = this.leaveService.myLeaveBalance;
+  readonly pendingCount = this.leaveService.pendingCount;
 
   readonly recentHistory = computed(() =>
     this.leaveService.myLeaveHistory().slice(0, RECENT_LIMIT)
   );
+
+  readonly teamOnLeave = computed(() => {
+    const user = this.auth.currentUser();
+    return this.leaveService.allRequests()
+      .filter(r => r.status === 'approved' && r.employee.id !== user?.id)
+      .slice(0, 5);
+  });
 
   readonly tableColumns: ColumnDef[] = [
     { key: 'leaveTypeLabel', label: 'ประเภทการลา', type: 'text' },
@@ -42,4 +65,7 @@ export class EmployeeDashboardComponent {
   readonly tableData = computed(() =>
     this.recentHistory() as unknown as Record<string, unknown>[]
   );
+
+  readonly clockIcon = faClock;
+  readonly arrowRightIcon = faArrowRight;
 }

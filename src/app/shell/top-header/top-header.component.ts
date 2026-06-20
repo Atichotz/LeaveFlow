@@ -1,6 +1,6 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBars, faBell, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faBell, faMagnifyingGlass, faXmark, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../core/services/auth.service';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
@@ -16,6 +16,7 @@ export class TopHeaderComponent {
   readonly menuToggle = output<void>();
 
   readonly showMobileSearch = signal(false);
+  readonly showMockupBanner = signal(true);
 
   toggleMobileSearch(): void {
     this.showMobileSearch.update(v => !v);
@@ -25,4 +26,5 @@ export class TopHeaderComponent {
   readonly searchIcon = faMagnifyingGlass;
   readonly closeIcon = faXmark;
   readonly bellIcon = faBell;
+  readonly warningIcon = faTriangleExclamation;
 }

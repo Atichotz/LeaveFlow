@@ -17,11 +17,34 @@
 
   <!-- Divider -->
   <div class="mx-4 h-px bg-white/10"></div>
-  <button (click)="ToggleAdmin.set(!ToggleAdmin())"
-    class="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-    title="Toggle sidebar">
-    {{ ToggleAdmin() ? 'Switch to Employee View' : 'Switch to Admin View' }}
-  </button>
+
+  <!-- View mode toggle -->
+  <div class="mx-3 my-2">
+    <p class="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-widest text-white/30">โหมดดูข้อมูล</p>
+    <button (click)="ToggleAdmin.set(!ToggleAdmin())"
+      class="relative flex w-full cursor-pointer items-center rounded-xl bg-white/10 p-1 transition-colors hover:bg-white/15"
+      title="สลับโหมด">
+      <!-- sliding indicator -->
+      <span
+        class="absolute top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-lg bg-white/20 shadow-sm transition-all duration-200"
+        [style.left]="ToggleAdmin() ? 'calc(50% - 1px)' : '4px'">
+      </span>
+      <!-- Employee tab -->
+      <span
+        class="relative z-10 flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition-colors duration-200"
+        [ngClass]="ToggleAdmin() ? 'text-white/40' : 'text-white'">
+        <fa-icon [icon]="employeeIcon" class="text-[11px]" />
+        พนักงาน
+      </span>
+      <!-- Admin tab -->
+      <span
+        class="relative z-10 flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition-colors duration-200"
+        [ngClass]="ToggleAdmin() ? 'text-white' : 'text-white/40'">
+        <fa-icon [icon]="adminIcon" class="text-[11px]" />
+        แอดมิน
+      </span>
+    </button>
+  </div>
 
   <!-- Nav -->
   <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
@@ -35,6 +58,17 @@
     </a>
     }
   </nav>
+
+  <!-- Promo card -->
+  <div class="mx-3 mb-3 rounded-xl bg-sidebar-active p-4">
+    <div class="text-2xl mb-1">🌴</div>
+    <p class="text-sm font-semibold text-white mb-0.5">วางแผนการลาของคุณ</p>
+    <p class="text-xs text-white/60 mb-3">ยื่นคำขอและพักผ่อน คุณได้รับมันแล้ว!</p>
+    <a routerLink="/employee/request" (click)="closed.emit()"
+      class="block rounded-lg bg-white py-1.5 text-center text-xs font-semibold text-sidebar hover:bg-white/90 transition-colors">
+      ยื่นคำขอลา
+    </a>
+  </div>
 
   <!-- User profile + Logout -->
   @if (auth.currentUser(); as user) {

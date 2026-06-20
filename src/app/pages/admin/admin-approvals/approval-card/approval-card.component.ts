@@ -5,6 +5,8 @@ import {
   faCalendarDays,
   faTag,
   faFileLines,
+  faCircleCheck,
+  faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { LeaveRequest } from '../../../../core/models';
 import { AvatarComponent } from '../../../../shared/components/avatar/avatar.component';
@@ -24,5 +26,7 @@ export class ApprovalCardComponent {
     calendar: faCalendarDays,
     tag: faTag,
     file: faFileLines,
+    approve: faCircleCheck,
+    reject: faCircleXmark,
   };
 }

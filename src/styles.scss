@@ -1,37 +1,14 @@
-/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 /* ─── Tailwind directives ─────────────────────────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Custom Theme (Tailwind v4: CSS-first, แทน tailwind.config.js) ─────────── */
-@theme {
-  /* Sidebar */
-  --color-sidebar: #1E3A5F;
-  --color-sidebar-hover: #243f6a;
-  --color-sidebar-active: #2d4f7f;
-
-  /* Primary (blue) */
-  --color-primary: #3B82F6;
-  --color-primary-hover: #2563EB;
-  --color-primary-light: #EFF6FF;
-
-  /* Status */
-  --color-status-approved: #10B981;
-  --color-status-approved-bg: #ECFDF5;
-  --color-status-pending: #F59E0B;
-  --color-status-pending-bg: #FFFBEB;
-  --color-status-rejected: #EF4444;
-  --color-status-rejected-bg: #FEF2F2;
-}
-
 /* ─── Base ────────────────────────────────────────────────────────────────── */
+/* Fonts are loaded via <link> in index.html (with preconnect for performance) */
 @layer base {
   body {
-    font-family: 'Inter', sans-serif;
-    @apply bg-gray-100 text-gray-800;
+    font-family: 'Noto Sans Thai', sans-serif;
+    @apply bg-slate-50 text-gray-800;
   }
 }
 
@@ -44,53 +21,68 @@
 @layer components {
 
   /* ── Card ─────────────────────────────────────────────────────────────── */
-  /* ใช้: stat-card, data-table, approval-card, leave-balance-card */
   .card {
-    @apply rounded-xl bg-white shadow-sm;
+    @apply rounded-2xl bg-white border border-gray-100 shadow-sm;
   }
 
   /* ── Buttons ──────────────────────────────────────────────────────────── */
-  /* Base: reset browser defaults, ทุก button variant ต้อง compose จาก .btn */
+  /* ใช้ base classes แบบ explicit ใน variant แต่ละตัว                       */
+  /* เพราะ Tailwind v3 มีปัญหา @apply class ที่ใช้ @apply ซ้อนกัน           */
   .btn {
-    @apply rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-primary text-white hover:bg-primary-hover;
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-sm;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+
+    &:not(:disabled):hover {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+    }
   }
 
   .btn-danger {
-    @apply btn bg-red-500 text-white hover:bg-red-600;
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-red-500 text-white hover:bg-red-600;
   }
 
   .btn-success {
-    @apply btn bg-emerald-500 text-white hover:bg-emerald-600;
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-emerald-500 text-white hover:bg-emerald-600;
   }
 
   .btn-outline {
-    @apply btn border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50;
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition-all cursor-pointer
+           disabled:opacity-50 disabled:cursor-not-allowed
+           border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300;
   }
 
   /* ── Status Badge ─────────────────────────────────────────────────────── */
-  /* ใช้: status-badge component, approval-card, history table */
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
   .badge-approved {
-    @apply badge bg-emerald-50 text-emerald-700;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-emerald-50 text-emerald-700;
   }
 
   .badge-pending {
-    @apply badge bg-amber-50 text-amber-700;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-amber-50 text-amber-700;
   }
 
   .badge-rejected {
-    @apply badge bg-red-50 text-red-700;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+           bg-red-50 text-red-700;
   }
 
   /* ── Form Field ───────────────────────────────────────────────────────── */
-  /* ใช้: login form, leave-request form */
   .form-field {
     @apply flex flex-col gap-1.5;
   }
@@ -100,17 +92,18 @@
   }
 
   .form-input {
-    @apply rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-50 disabled:text-gray-400;
+    @apply rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800
+           focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20
+           disabled:bg-gray-50 disabled:text-gray-400 transition-colors;
   }
 
   /* ── Table ────────────────────────────────────────────────────────────── */
-  /* ใช้: data-table component (admin + employee history) */
   .table-wrapper {
-    @apply overflow-hidden rounded-xl bg-white shadow-sm;
+    @apply overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm;
   }
 
   .table-header-cell {
-    @apply px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500;
+    @apply px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-400;
   }
 
   .table-cell {
@@ -118,18 +111,68 @@
   }
 
   .table-row {
-    @apply hover:bg-gray-50 transition-colors;
+    @apply hover:bg-slate-50 transition-colors;
   }
 
   /* ── Section Title ────────────────────────────────────────────────────── */
-  /* ใช้: card header, page section */
   .section-title {
-    @apply text-lg font-semibold text-gray-700;
+    @apply text-base font-semibold text-gray-700;
+    font-family: 'Noto Sans Thai', sans-serif;
   }
 
   /* ── Page Title ───────────────────────────────────────────────────────── */
   .page-title {
-    @apply text-2xl font-bold text-gray-800;
+    @apply text-2xl font-bold text-gray-900;
+    font-family: 'Noto Sans Thai', sans-serif;
   }
 }
 
+/* ─── Animation keyframes ──────────────────────────────────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blob-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-14px) scale(1.03); }
+}
+
+/* ─── Animation utilities ──────────────────────────────────────────────────── */
+@layer utilities {
+  .animate-fade-in-up  { animation: fade-in-up    0.5s  cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-fade-in     { animation: fade-in        0.35s ease                            both; }
+  .animate-scale-in    { animation: scale-in       0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-slide-right { animation: slide-in-right 0.4s  cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-slide-up    { animation: slide-up       0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-blob        { animation: blob-float     7s    ease-in-out infinite; }
+}
+
+/* ─── Accessibility: respect reduced-motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+  }
+}

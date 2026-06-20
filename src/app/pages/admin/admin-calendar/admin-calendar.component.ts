@@ -1,19 +1,25 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronLeft, faChevronRight,
+  faUsers, faClock, faCalendarCheck, faCalendarDays,
+} from '@fortawesome/free-solid-svg-icons';
 import { LeaveService } from '../../../core/services/leave.service';
-import { LeaveRequest } from '../../../core/models';
+import { LeaveRequest, LeaveStatus } from '../../../core/models';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
-import { HOLIDAY_DATE_SET, HOLIDAY_MAP } from '../../../core/mock/holidays.mock';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { HOLIDAY_DATE_SET, HOLIDAY_MAP, MOCK_HOLIDAYS_2026 } from '../../../core/mock/holidays.mock';
 
 interface CalendarDay {
   date: Date;
-  dateKey: string;        // 'yyyy-mm-dd' for O(1) lookup
+  dateKey: string;
   isCurrentMonth: boolean;
   isToday: boolean;
   isHoliday: boolean;
   holidayName?: string;
 }
+
+type StatusFilter = LeaveStatus | 'all';
 
 const MONTH_NAMES_TH = [
   'มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
@@ -26,7 +32,6 @@ function toDateKey(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** วันที่ระหว่าง start–end (inclusive) */
 function eachDayOfRange(start: Date, end: Date): Date[] {
   const days: Date[] = [];
   const cur = new Date(start);
@@ -42,27 +47,40 @@ function eachDayOfRange(start: Date, end: Date): Date[] {
 
 @Component({
   selector: 'app-admin-calendar',
-  imports: [FontAwesomeModule, AvatarComponent],
+  imports: [FontAwesomeModule, AvatarComponent, StatusBadgeComponent],
   templateUrl: './admin-calendar.component.html',
   styleUrl: './admin-calendar.component.scss',
 })
 export class AdminCalendarComponent {
   private readonly leaveService = inject(LeaveService);
 
-  readonly icons = { prev: faChevronLeft, next: faChevronRight };
+  readonly icons = {
+    prev: faChevronLeft, next: faChevronRight,
+    users: faUsers, clock: faClock,
+    calCheck: faCalendarCheck, calDays: faCalendarDays,
+  };
   readonly dayNames = DAY_NAMES;
+  readonly MAX_CELL_VISIBLE = 2;
 
   private readonly today = new Date();
+  readonly todayKey = toDateKey(this.today);
 
-  readonly currentYear = signal(this.today.getFullYear());
-  readonly currentMonth = signal(this.today.getMonth()); // 0-indexed
+  readonly currentYear  = signal(this.today.getFullYear());
+  readonly currentMonth = signal(this.today.getMonth());
+  readonly statusFilter = signal<StatusFilter>('all');
+  readonly selectedDate = signal<string | null>(null);
 
   readonly monthLabel = computed(
     () => `${MONTH_NAMES_TH[this.currentMonth()]} ${this.currentYear()}`
   );
 
-  /** Map dateKey → LeaveRequest[] สำหรับทุก request (approved + pending) */
-  readonly leavesByDate = computed<Map<string, LeaveRequest[]>>(() => {
+  readonly isCurrentDisplayedMonth = computed(() => {
+    const now = new Date();
+    return this.currentYear() === now.getFullYear() && this.currentMonth() === now.getMonth();
+  });
+
+  // All non-rejected leaves mapped to dates — used for stats, side panel, upcoming
+  private readonly allLeavesByDate = computed<Map<string, LeaveRequest[]>>(() => {
     const map = new Map<string, LeaveRequest[]>();
     for (const req of this.leaveService.allRequests()) {
       if (req.status === 'rejected') continue;
@@ -76,19 +94,46 @@ export class AdminCalendarComponent {
     return map;
   });
 
-  /** Grid ของเดือนปัจจุบัน (6 แถว × 7 วัน = 42 cells, Monday-first) */
+  // Filtered for calendar display only (respects statusFilter)
+  private readonly filteredLeavesByDate = computed<Map<string, LeaveRequest[]>>(() => {
+    const filter = this.statusFilter();
+    if (filter === 'all') return this.allLeavesByDate();
+    const map = new Map<string, LeaveRequest[]>();
+    for (const [key, leaves] of this.allLeavesByDate()) {
+      const filtered = leaves.filter(r => r.status === filter);
+      if (filtered.length > 0) map.set(key, filtered);
+    }
+    return map;
+  });
+
+  // ── Stats ────────────────────────────────────────────────────────────────────
+
+  readonly todayLeaveCount = computed(() =>
+    this.allLeavesByDate().get(this.todayKey)?.length ?? 0
+  );
+
+  readonly pendingCount      = this.leaveService.pendingCount;
+  readonly approvedThisMonth = this.leaveService.approvedThisMonth;
+
+  readonly holidaysThisMonth = computed(() => {
+    const y = this.currentYear();
+    const m = this.currentMonth();
+    return MOCK_HOLIDAYS_2026.filter(h =>
+      h.date.getFullYear() === y && h.date.getMonth() === m
+    ).length;
+  });
+
+  // ── Calendar grid ────────────────────────────────────────────────────────────
+
   readonly calendarDays = computed<CalendarDay[]>(() => {
-    const year = this.currentYear();
+    const year  = this.currentYear();
     const month = this.currentMonth();
-    const todayKey = toDateKey(this.today);
 
-    const firstOfMonth = new Date(year, month, 1);
-    // getDay(): 0=Sun 1=Mon ... 6=Sat → shift to Mon-first: Sun→6, else day-1
-    const rawDay = firstOfMonth.getDay();
+    const firstOfMonth  = new Date(year, month, 1);
+    const rawDay        = firstOfMonth.getDay();
     const paddingBefore = rawDay === 0 ? 6 : rawDay - 1;
-
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const totalCells = Math.ceil((paddingBefore + daysInMonth) / 7) * 7;
+    const daysInMonth   = new Date(year, month + 1, 0).getDate();
+    const totalCells    = Math.ceil((paddingBefore + daysInMonth) / 7) * 7;
 
     const days: CalendarDay[] = [];
     const startDate = new Date(year, month, 1 - paddingBefore);
@@ -98,22 +143,22 @@ export class AdminCalendarComponent {
       date.setDate(startDate.getDate() + i);
       const dateKey = toDateKey(date);
       days.push({
-        date,
-        dateKey,
+        date, dateKey,
         isCurrentMonth: date.getMonth() === month,
-        isToday: dateKey === todayKey,
-        isHoliday: HOLIDAY_DATE_SET.has(dateKey),
-        holidayName: HOLIDAY_MAP.get(dateKey),
+        isToday:        dateKey === this.todayKey,
+        isHoliday:      HOLIDAY_DATE_SET.has(dateKey),
+        holidayName:    HOLIDAY_MAP.get(dateKey),
       });
     }
     return days;
   });
 
-  readonly selectedDate = signal<string | null>(null);
+  // ── Selected day ─────────────────────────────────────────────────────────────
 
+  // Side panel always shows ALL leaves (not filtered) for selected day
   readonly selectedDayLeaves = computed<LeaveRequest[]>(() => {
     const key = this.selectedDate();
-    return key ? (this.leavesByDate().get(key) ?? []) : [];
+    return key ? (this.allLeavesByDate().get(key) ?? []) : [];
   });
 
   readonly selectedDayLabel = computed(() => {
@@ -123,19 +168,40 @@ export class AdminCalendarComponent {
     return `${d} ${MONTH_NAMES_TH[m - 1]} ${y}`;
   });
 
-  readonly selectedDateIsHoliday = computed(() => {
-    const key = this.selectedDate();
-    return key ? HOLIDAY_DATE_SET.has(key) : false;
-  });
-
   readonly selectedDateHolidayName = computed(() => {
     const key = this.selectedDate();
     return key ? (HOLIDAY_MAP.get(key) ?? null) : null;
   });
 
+  // ── Upcoming leaves (next 7 days from today) ─────────────────────────────────
+
+  readonly upcomingLeaves = computed<{ dateKey: string; label: string; leaves: LeaveRequest[] }[]>(() => {
+    const result: { dateKey: string; label: string; leaves: LeaveRequest[] }[] = [];
+    for (let i = 0; i <= 6; i++) {
+      const d = new Date(this.today);
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + i);
+      const key    = toDateKey(d);
+      const leaves = this.allLeavesByDate().get(key);
+      if (leaves && leaves.length > 0) {
+        const [, m, day] = key.split('-').map(Number);
+        const label = i === 0 ? 'วันนี้' : `${day} ${MONTH_NAMES_TH[m - 1]}`;
+        result.push({ dateKey: key, label, leaves });
+      }
+    }
+    return result;
+  });
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  getDayLeaves(key: string): LeaveRequest[] {
+    return this.filteredLeavesByDate().get(key) ?? [];
+  }
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
+
   prevMonth(): void {
-    const m = this.currentMonth();
-    if (m === 0) {
+    if (this.currentMonth() === 0) {
       this.currentMonth.set(11);
       this.currentYear.update(y => y - 1);
     } else {
@@ -145,8 +211,7 @@ export class AdminCalendarComponent {
   }
 
   nextMonth(): void {
-    const m = this.currentMonth();
-    if (m === 11) {
+    if (this.currentMonth() === 11) {
       this.currentMonth.set(0);
       this.currentYear.update(y => y + 1);
     } else {
@@ -155,19 +220,17 @@ export class AdminCalendarComponent {
     this.selectedDate.set(null);
   }
 
+  goToToday(): void {
+    this.currentMonth.set(this.today.getMonth());
+    this.currentYear.set(this.today.getFullYear());
+    this.selectedDate.set(null);
+  }
+
   selectDay(key: string): void {
     this.selectedDate.set(this.selectedDate() === key ? null : key);
   }
 
-  getDayLeaves(key: string): LeaveRequest[] {
-    return this.leavesByDate().get(key) ?? [];
-  }
-
-  hasApproved(leaves: LeaveRequest[]): boolean {
-    return leaves.some(l => l.status === 'approved');
-  }
-
-  hasPending(leaves: LeaveRequest[]): boolean {
-    return leaves.some(l => l.status === 'pending');
+  setStatusFilter(f: StatusFilter): void {
+    this.statusFilter.set(f);
   }
 }

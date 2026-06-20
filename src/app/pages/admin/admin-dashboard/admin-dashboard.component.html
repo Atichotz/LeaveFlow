@@ -1,7 +1,7 @@
 <div class="space-y-6">
 
   <!-- Page heading -->
-  <div>
+  <div class="animate-fade-in-up">
     <h1 class="page-title">Admin Dashboard</h1>
     <p class="mt-0.5 text-sm text-gray-500">ภาพรวมระบบการลาพนักงาน</p>
   </div>
@@ -21,6 +21,7 @@
         [icon]="icons.users"
         iconColorClass="text-primary"
         iconBgClass="bg-primary-light"
+        class="animate-fade-in-up"
       />
       <app-stat-card
         label="คำขอรออนุมัติ"
@@ -28,6 +29,7 @@
         [icon]="icons.pending"
         iconColorClass="text-amber-600"
         iconBgClass="bg-amber-50"
+        class="animate-fade-in-up [animation-delay:100ms]"
       />
       <app-stat-card
         label="อนุมัติแล้วเดือนนี้"
@@ -35,6 +37,7 @@
         [icon]="icons.approved"
         iconColorClass="text-emerald-600"
         iconBgClass="bg-emerald-50"
+        class="animate-fade-in-up [animation-delay:200ms]"
       />
       <app-stat-card
         label="วันหยุดนักขัตฤกษ์เดือนนี้"
@@ -42,12 +45,13 @@
         [icon]="icons.holiday"
         iconColorClass="text-purple-600"
         iconBgClass="bg-purple-50"
+        class="animate-fade-in-up [animation-delay:300ms]"
       />
     </div>
   }
 
   <!-- Recent leave requests -->
-  <div>
+  <div class="animate-fade-in-up [animation-delay:200ms]">
     <div class="mb-3 flex items-center justify-between">
       <h2 class="section-title">คำขอลาล่าสุด</h2>
       <a routerLink="/admin/approvals" class="text-sm text-primary hover:underline">

@@ -1,8 +1,19 @@
-<app-stat-card
-  [label]="balance().label"
-  [value]="balance().remaining"
-  [icon]="config().icon"
-  [iconColorClass]="config().iconColorClass"
-  [iconBgClass]="config().iconBgClass"
-  [subtext]="subtext()"
-/>
+<div class="card p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default">
+  <div class="flex items-start gap-4 mb-4">
+    <div [class]="config().iconBgClass" class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl">
+      <fa-icon [icon]="config().icon" [class]="config().iconColorClass" class="text-xl" />
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-xs font-medium uppercase tracking-wider text-gray-400">{{ balance().label }}</p>
+      <div class="flex items-baseline gap-1.5 mt-0.5">
+        <p class="text-3xl font-bold text-gray-900">{{ balance().remaining }}</p>
+        <span class="text-sm text-gray-400">วันคงเหลือ</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+    <div [class]="config().progressClass" class="h-full rounded-full transition-all duration-700" [style.width.%]="progressPercent()"></div>
+  </div>
+  <p class="mt-1.5 text-xs text-gray-400">{{ progressPercent() }}% จาก {{ balance().total }} วัน</p>
+</div>

@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -11,6 +12,8 @@ import {
   faPlus,
   faClockRotateLeft,
   faRightFromBracket,
+  faUser,
+  faUserShield,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../core/services/auth.service';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
@@ -37,7 +40,7 @@ const EMPLOYEE_NAV: NavItem[] = [
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, FontAwesomeModule, AvatarComponent],
+  imports: [NgClass, RouterLink, RouterLinkActive, FontAwesomeModule, AvatarComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -55,6 +58,8 @@ export class SidebarComponent {
   );
 
   readonly logoutIcon = faRightFromBracket;
+  readonly employeeIcon = faUser;
+  readonly adminIcon = faUserShield;
 
   logout(): void {
     this.auth.logout();
